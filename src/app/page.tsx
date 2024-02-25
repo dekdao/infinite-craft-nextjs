@@ -7,6 +7,7 @@ import { ElementCardDraggableWrapper } from "../components/element-card";
 import { useDrop } from "react-dnd";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
+import { Trash } from "lucide-react";
 
 export default function Home() {
   const [elements, setElements] = useState<Element[]>([]);
@@ -30,6 +31,10 @@ export default function Home() {
     if (elements.length === 0) return;
     localStorage.setItem("elements", JSON.stringify(elements));
   }, [elements]);
+
+  const onClearPlacedElements = () => {
+    setPlacedElements([]);
+  };
 
   const onChangePosition = async (
     placedElement: PlacedElement,
@@ -131,7 +136,7 @@ export default function Home() {
   return (
     <main className="flex h-screen flex-col">
       <div className="grid grid-cols-12 h-full">
-        <div ref={drop} className="col-span-9 h-full w-full">
+        <div ref={drop} className="col-span-9 h-full w-full relative">
           {placedElements.map((element, index) => (
             <ElementCardDraggableWrapper
               key={index}
@@ -140,6 +145,12 @@ export default function Home() {
               onChangePosition={onChangePosition}
             />
           ))}
+          <div
+            className="absolute top-0 left-0 p-4 cursor-pointer hover:text-red-400"
+            onClick={onClearPlacedElements}
+          >
+            <Trash />
+          </div>
         </div>
         <SideBar elements={elements} />
       </div>
