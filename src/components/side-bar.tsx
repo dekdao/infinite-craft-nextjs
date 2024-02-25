@@ -1,7 +1,7 @@
 import { Telescope } from "lucide-react";
 import { useState } from "react";
 import { Sort, SortButton } from "./sort-button";
-import { Element } from "@/app/interfaces/element";
+import { Element } from "@/interfaces/element";
 import { ElementCardSideBarWrapper } from "./element-card";
 
 export const SideBar = ({ elements }: { elements: Element[] }) => {
