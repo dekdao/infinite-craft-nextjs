@@ -7,7 +7,7 @@ import { ElementCardDraggableWrapper } from "../components/element-card";
 import { useDrop } from "react-dnd";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
-import { Trash } from "lucide-react";
+import { RotateCcw, Trash } from "lucide-react";
 
 export default function Home() {
   const [elements, setElements] = useState<Element[]>([]);
@@ -34,6 +34,11 @@ export default function Home() {
 
   const onClearPlacedElements = () => {
     setPlacedElements([]);
+  };
+
+  const onClearElements = () => {
+    onClearPlacedElements();
+    setElements(defaultElement);
   };
 
   const onChangePosition = async (
@@ -149,10 +154,16 @@ export default function Home() {
             />
           ))}
           <div
-            className="absolute top-0 left-0 p-4 cursor-pointer hover:text-red-400"
+            className="absolute top-0 right-0 p-4 cursor-pointer hover:text-red-400"
             onClick={onClearPlacedElements}
           >
             <Trash />
+          </div>
+          <div
+            className="absolute top-0 left-0 p-4 cursor-pointer hover:text-red-400"
+            onClick={onClearElements}
+          >
+            <RotateCcw />
           </div>
           {/* {placedElements.map((element, index) => {
             const width = `${element.emoji} ${element.text}`.length * 9;
