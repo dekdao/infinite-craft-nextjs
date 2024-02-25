@@ -3,9 +3,16 @@ import connectDb from "@/libs/connect-db";
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 
+// for openai
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
 });
+
+// for togetherai
+// const openai = new OpenAI({
+//   apiKey: process.env.NEXT_PUBLIC_TOGETHER_AI_API_KEY,
+//   baseURL: "https://api.together.xyz/v1",
+// });
 
 type ResponseData = {
   message: string;
@@ -51,8 +58,10 @@ export default async function handler(
 
         Example: 
         น้ำ + ไฟ = ไอน้ำ
-        ดิน + ไฟ = ลาวา
+        ไฟ + ดิน = ลาวา
         คน + ผู้หญิง = แม่
+        เมฆ + น้ำ = ฝน
+        น้ำ + ดิน = โคลน
         
         ONLY answer in the following JSON format. 
         
@@ -60,6 +69,7 @@ export default async function handler(
       },
       { role: "user", content: `${word1} + ${word2} =` },
     ],
+    // model: "gpt-3.5-turbo",
     model: "gpt-4-turbo-preview",
     max_tokens: 2048,
     response_format: { type: "json_object" },
