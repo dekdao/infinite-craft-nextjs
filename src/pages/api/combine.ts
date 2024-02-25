@@ -39,7 +39,7 @@ export default async function handler(
 
   const existingElement = await ElementModel.findOne({ word1, word2 });
   if (existingElement) {
-    res.status(200).json({
+    return res.status(200).json({
       message: "element already exists",
       element: {
         emoji: existingElement.emoji,
@@ -47,7 +47,6 @@ export default async function handler(
         discovered: false,
       },
     });
-    return;
   }
 
   const chatCompletion = await openai.chat.completions.create({
@@ -83,6 +82,14 @@ export default async function handler(
 
   const jsonOutput = JSON.parse(output);
 
+  const existingElement2 = await ElementModel.findOne({
+    text: jsonOutput.text.toLowerCase(),
+  });
+  
+  if (existingElement2) {
+    jsonOutput.emoji = existingElement2.emoji;
+  }
+
   const newElement = new ElementModel({
     word1,
     word2,
@@ -91,7 +98,7 @@ export default async function handler(
   });
   await newElement.save();
 
-  res.status(200).json({
+  return res.status(200).json({
     message: "new element created",
     element: {
       emoji: jsonOutput.emoji,
