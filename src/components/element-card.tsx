@@ -1,5 +1,6 @@
 import Draggable from "react-draggable";
 import { Element, PlacedElement } from "../interfaces/element";
+import { useDrag } from "react-dnd";
 
 export const ElementCard = ({ element }: { element: Element }) => {
   return (
@@ -15,13 +16,16 @@ export const ElementCardSideBarWrapper = ({
 }: {
   element: Element;
 }) => {
+  const [, drag] = useDrag(() => ({
+    type: "sidebar-element",
+    item: element,
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
+
   return (
-    <div
-      draggable
-      onDragStart={(e) => {
-        e.dataTransfer.setData("element-text", element.text);
-      }}
-    >
+    <div ref={drag} className="opacity-1 cursor-grab">
       <ElementCard element={element} />
     </div>
   );
