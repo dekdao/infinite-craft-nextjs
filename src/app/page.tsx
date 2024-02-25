@@ -1,42 +1,60 @@
 "use client";
-
-import { Telescope } from "lucide-react";
-import { useState } from "react";
-import { Sort, SortButton } from "./components/sort-button";
+import { useEffect, useState } from "react";
+import { SideBar } from "./components/side-bar";
+import { Element, PlacedElement } from "@/app/interfaces/element";
+import { defaultElement } from "./constants/default-element";
+import { ElementCardDraggableWrapper } from "./components/element-card";
 
 export default function Home() {
-  const [sort, setSort] = useState(Sort.Time);
+  const [elements, setElements] = useState<Element[]>([]);
+  const [placedElements, setPlacedElements] = useState<PlacedElement[]>([]);
 
-  const onRotateSort = () => {
-    switch (sort) {
-      case Sort.Time:
-        setSort(Sort.Name);
-        break;
-      case Sort.Name:
-        setSort(Sort.Emoji);
-        break;
-      case Sort.Emoji:
-        setSort(Sort.Time);
-        break;
+  useEffect(() => {
+    const items = localStorage.getItem("elements");
+    if (items && JSON.parse(items).length > 0) {
+      setElements(JSON.parse(items));
+    } else {
+      setElements(defaultElement);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("elements", JSON.stringify(elements));
+  }, [elements]);
+
+  const onDropElement = (e: React.DragEvent<HTMLDivElement>) => {
+    const elementText = e.dataTransfer.getData("element-text");
+    const element = elements.find((e) => e.text === elementText);
+    if (element) {
+      console.log(e);
+      setPlacedElements([
+        ...placedElements,
+        {
+          ...element,
+          x: e.clientX,
+          y: e.clientY,
+        },
+      ]);
     }
   };
 
   return (
     <main className="flex h-screen flex-col">
       <div className="grid grid-cols-12 h-full">
-        <div className="col-span-9">A</div>
-        <div className="col-span-3 border-l h-screen flex flex-col">
-          <div className="flex-1 overflow-auto">Element</div>
-          <div className="h-24 border-t flex-shrink-0 flex-col">
-            <div className="flex h-10">
-              <button className="flex flex-1 border gap-2 justify-center items-center">
-                <Telescope /> Discoveries
-              </button>
-              <SortButton sort={sort} onClick={onRotateSort} />
-            </div>
-            <div className="flex-1">Element</div>
-          </div>
+        <div
+          className="col-span-9 h-full w-full"
+          onDrop={onDropElement}
+          onDragOver={(e) => e.preventDefault()}
+        >
+          {placedElements.map((element, index) => (
+            <ElementCardDraggableWrapper
+              key={index}
+              element={element}
+              index={index}
+            />
+          ))}
         </div>
+        <SideBar elements={elements} />
       </div>
     </main>
   );
