@@ -56,7 +56,7 @@ export default async function handler(
         
         ONLY answer in the following JSON format. 
         
-        { "emoji": [emoji represent the text], "text": [text in the same language as the 2 words] }`,
+        { "emoji": [emoji that best represent the text], "text": [text in the same language as the 2 words] }`,
       },
       { role: "user", content: `${word1} + ${word2} =` },
     ],

@@ -1,11 +1,13 @@
-import { Telescope } from "lucide-react";
-import { useState } from "react";
+import { Search, Telescope } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Sort, SortButton } from "./sort-button";
 import { Element } from "@/interfaces/element";
 import { ElementCardSideBarWrapper } from "./element-card";
 
 export const SideBar = ({ elements }: { elements: Element[] }) => {
   const [sort, setSort] = useState(Sort.Time);
+  const [isDiscoveries, setIsDiscoveries] = useState(false);
+  const [word, setWord] = useState("");
 
   const onRotateSort = () => {
     switch (sort) {
@@ -21,23 +23,59 @@ export const SideBar = ({ elements }: { elements: Element[] }) => {
     }
   };
 
+  const sortedElement = useMemo(() => {
+    const sortedElement = [...elements];
+    switch (sort) {
+      case Sort.Time:
+        return sortedElement;
+      case Sort.Name:
+        return sortedElement.sort((a, b) => a.text.localeCompare(b.text));
+      case Sort.Emoji:
+        return sortedElement.sort((a, b) => a.emoji.localeCompare(b.emoji));
+    }
+  }, [elements, sort]);
+
   return (
     <div className="col-span-3 border-l h-screen flex flex-col">
       <div className="flex flex-1 justify-start items-start">
         <div className="flex flex-wrap gap-2 p-2">
-          {elements.map((element) => (
-            <ElementCardSideBarWrapper key={element.text} element={element} />
-          ))}
+          {sortedElement
+            .filter((v) => !isDiscoveries || (isDiscoveries && v.discovered))
+            .filter((v) => !word || v.text.includes(word) || v.emoji.includes(word))
+            .map((element) => (
+              <ElementCardSideBarWrapper key={element.text} element={element} />
+            ))}
         </div>
       </div>
-      <div className="h-24 border-t flex-shrink-0 flex-col">
+      <div className="h-22 border-t flex-shrink-0 flex-col">
         <div className="flex h-10">
-          <button className="flex flex-1 border gap-2 justify-center items-center">
-            <Telescope /> Discoveries
-          </button>
+          {!isDiscoveries && (
+            <button
+              className="flex flex-1 border gap-2 justify-center items-center"
+              onClick={() => setIsDiscoveries(true)}
+            >
+              <Telescope /> Discoveries
+            </button>
+          )}
+          {isDiscoveries && (
+            <button
+              className="flex flex-1 border gap-2 justify-center items-center bg-gray-500"
+              onClick={() => setIsDiscoveries(false)}
+            >
+              <Telescope /> Discoveries
+            </button>
+          )}
           <SortButton sort={sort} onClick={onRotateSort} />
         </div>
-        <div className="flex-1">Element</div>
+        <div className="flex items-center gap-2 p-2">
+          <Search />{" "}
+          <input
+            value={word}
+            onChange={(e) => setWord(e.target.value)}
+            className="flex px-2 rounded-md w-full text-gray-600"
+            placeholder="Search..."
+          />
+        </div>
       </div>
     </div>
   );
