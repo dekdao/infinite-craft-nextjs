@@ -23,17 +23,44 @@ export default function Home() {
     localStorage.setItem("elements", JSON.stringify(elements));
   }, [elements]);
 
+  const onChangePosition = (index: number, x: number, y: number) => {
+    const overlappingElementIndex = placedElements.findIndex((element, i) => {
+      const width = `${element.emoji} ${element.text}`.length * 10;
+      return (
+        i !== index &&
+        x < element.x + width &&
+        x > element.x - width &&
+        y < element.y + 20 &&
+        y > element.y - 20
+      );
+    });
+    if (overlappingElementIndex !== -1) {
+      console.log("overlapping element", index, overlappingElementIndex);
+    } else {
+      setPlacedElements((prev) => {
+        const newPlacedElements = [...prev];
+        newPlacedElements[index] = {
+          ...newPlacedElements[index],
+          x,
+          y,
+        };
+        return newPlacedElements;
+      });
+    }
+  };
+
   const [, drop] = useDrop(() => ({
     accept: "sidebar-element",
     drop: (element: Element, monitor) => {
       const clientOffset = monitor.getClientOffset();
       if (element && clientOffset) {
+        const width = `${element.emoji} ${element.text}`.length * 10;
         setPlacedElements((prev) => [
           ...prev,
           {
             ...element,
-            x: clientOffset.x,
-            y: clientOffset.y,
+            x: clientOffset.x - width / 2,
+            y: clientOffset.y - 15,
           },
         ]);
       }
@@ -49,6 +76,7 @@ export default function Home() {
               key={index}
               element={element}
               index={index}
+              onChangePosition={onChangePosition}
             />
           ))}
         </div>

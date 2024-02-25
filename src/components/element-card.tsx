@@ -25,7 +25,7 @@ export const ElementCardSideBarWrapper = ({
   }));
 
   return (
-    <div ref={drag} className="opacity-1 cursor-grab">
+    <div ref={drag} className="opacity-1 cursor-grab w-fit h-fit">
       <ElementCard element={element} />
     </div>
   );
@@ -34,9 +34,11 @@ export const ElementCardSideBarWrapper = ({
 export const ElementCardDraggableWrapper = ({
   element,
   index,
+  onChangePosition,
 }: {
   element: PlacedElement;
   index: number;
+  onChangePosition: (index: number, x: number, y: number) => void;
 }) => {
   return (
     <Draggable
@@ -45,6 +47,9 @@ export const ElementCardDraggableWrapper = ({
         y: element.y,
       }}
       bounds="parent"
+      onStop={(e, data) => {
+        onChangePosition(index, data.x, data.y);
+      }}
     >
       <div className="absolute cursor-grabbing w-fit h-fit">
         <ElementCard element={element} />
