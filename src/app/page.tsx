@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { SideBar } from "./components/side-bar";
-import { Element, PlacedElement } from "@/app/interfaces/element";
-import { defaultElement } from "./constants/default-element";
-import { ElementCardDraggableWrapper } from "./components/element-card";
+import { SideBar } from "../components/side-bar";
+import { Element, PlacedElement } from "@/interfaces/element";
+import { defaultElement } from "../constants/default-element";
+import { ElementCardDraggableWrapper } from "../components/element-card";
 
 export default function Home() {
   const [elements, setElements] = useState<Element[]>([]);
