@@ -88,15 +88,18 @@ export default function Home() {
           },
         })
         .then(({ data }) => {
-          const newElement = {
-            ...data.element,
-            x: placedElement.x,
-            y: placedElement.y,
-          };
           const newPlacedElements = placedElements.filter(
             (v) => v.id !== placedElement.id && v.id !== overlappingElement.id
           );
-          setPlacedElements([...newPlacedElements, newElement]);
+          setPlacedElements([
+            ...newPlacedElements,
+            {
+              ...data.element,
+              id: uuid(),
+              x: overlappingElement.x,
+              y: overlappingElement.y,
+            },
+          ]);
           if (elements.every((element) => element.text !== data.element.text)) {
             setElements((prev) => [...prev, data.element]);
           }
@@ -112,6 +115,7 @@ export default function Home() {
         x: x,
         y: y,
       };
+      setPlacedElements(newPlacedElements);
     }
   };
 
@@ -128,7 +132,6 @@ export default function Home() {
           y: clientOffset.y - 15,
         };
         setPlacedElements((prev) => [...prev, placedElement]);
-        onChangePosition(placedElement, clientOffset.x, clientOffset.y);
       }
     },
   }));
@@ -151,6 +154,24 @@ export default function Home() {
           >
             <Trash />
           </div>
+          {/* {placedElements.map((element, index) => {
+            const width = `${element.emoji} ${element.text}`.length * 9;
+            return (
+              <div
+                key={index}
+                className="absolute bg-red-400"
+                style={{
+                  transform: `translate(${element.x}px, ${element.y}px)`,
+                  width: `${width}px`,
+                }}
+              >
+                <div className="flex gap-2 px-2 border rounded-xl h-fit w-fit">
+                  <div>{element.emoji}</div>
+                  <div>{element.text}</div>
+                </div>
+              </div>
+            );
+          })} */}
         </div>
         <SideBar elements={elements} />
       </div>

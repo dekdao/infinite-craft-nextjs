@@ -58,7 +58,7 @@ export const ElementCardDraggableWrapper = ({
     >
       <div className="absolute cursor-grabbing w-fit h-fit">
         {element.isLoading && (
-          <div className="flex gap-2 px-2 border rounded-xl h-fit w-fit">
+          <div className="flex gap-2 px-2 border rounded-xl h-fit w-fit ">
             <div>
               <Loader className="animate-spin inline-block" />
             </div>

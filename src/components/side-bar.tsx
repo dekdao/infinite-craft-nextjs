@@ -37,7 +37,7 @@ export const SideBar = ({ elements }: { elements: Element[] }) => {
 
   return (
     <div className="col-span-3 border-l h-screen flex flex-col">
-      <div className="flex flex-1 justify-start items-start">
+      <div className="flex flex-1 justify-start items-start overflow-y-scroll">
         <div className="flex flex-wrap gap-2 p-2">
           {sortedElement
             .filter((v) => !isDiscoveries || (isDiscoveries && v.discovered))
