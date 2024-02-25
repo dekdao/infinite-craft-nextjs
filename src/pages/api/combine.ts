@@ -1,4 +1,4 @@
-import { ElementModel } from "@/interfaces/element";
+import { Element, ElementModel } from "@/interfaces/element";
 import connectDb from "@/libs/connect-db";
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
@@ -9,6 +9,8 @@ const openai = new OpenAI({
 
 type ResponseData = {
   message: string;
+  element?: Element;
+  discovered?: boolean;
 };
 
 export default async function handler(
@@ -27,10 +29,17 @@ export default async function handler(
 
   const word1 = (w1 > w2 ? w1 : w2).toLowerCase();
   const word2 = (w1 > w2 ? w2 : w1).toLowerCase();
-  
+
   const existingElement = await ElementModel.findOne({ word1, word2 });
   if (existingElement) {
-    res.status(200).json(existingElement);
+    res.status(200).json({
+      message: "element already exists",
+      element: {
+        emoji: existingElement.emoji,
+        text: existingElement.text,
+        discovered: false,
+      },
+    });
     return;
   }
 
@@ -38,7 +47,16 @@ export default async function handler(
     messages: [
       {
         role: "system",
-        content: `Give me the word and emoji that represents the combination of ${word1} and ${word2}. ONLY answer in the following JSON format. { "emoji": [emoji represent the text], "text": [text in the same language as the 2 words] }`,
+        content: `Give me the word and emoji that represents the combination or something in between of ${word1} and ${word2}.
+
+        Example: 
+        น้ำ + ไฟ = ไอน้ำ
+        ดิน + ไฟ = ลาวา
+        คน + ผู้หญิง = แม่
+        
+        ONLY answer in the following JSON format. 
+        
+        { "emoji": [emoji represent the text], "text": [text in the same language as the 2 words] }`,
       },
       { role: "user", content: `${word1} + ${word2} =` },
     ],
@@ -59,9 +77,16 @@ export default async function handler(
     word1,
     word2,
     emoji: jsonOutput.emoji,
-    text: jsonOutput.text,
+    text: jsonOutput.text.toLowerCase(),
   });
   await newElement.save();
 
-  res.status(200).json(newElement);
+  res.status(200).json({
+    message: "new element created",
+    element: {
+      emoji: jsonOutput.emoji,
+      text: jsonOutput.text,
+      discovered: true,
+    },
+  });
 }

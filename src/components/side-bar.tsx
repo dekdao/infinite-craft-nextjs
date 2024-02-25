@@ -23,10 +23,12 @@ export const SideBar = ({ elements }: { elements: Element[] }) => {
 
   return (
     <div className="col-span-3 border-l h-screen flex flex-col">
-      <div className="flex flex-wrap flex-1 overflow-auto gap-2 p-2">
-        {elements.map((element) => (
-          <ElementCardSideBarWrapper key={element.text} element={element} />
-        ))}
+      <div className="flex flex-1 justify-start items-start">
+        <div className="flex flex-wrap gap-2 p-2">
+          {elements.map((element) => (
+            <ElementCardSideBarWrapper key={element.text} element={element} />
+          ))}
+        </div>
       </div>
       <div className="h-24 border-t flex-shrink-0 flex-col">
         <div className="flex h-10">

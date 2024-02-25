@@ -5,6 +5,8 @@ import { Element, PlacedElement } from "@/interfaces/element";
 import { defaultElement } from "../constants/default-element";
 import { ElementCardDraggableWrapper } from "../components/element-card";
 import { useDrop } from "react-dnd";
+import axios from "axios";
+import { v4 as uuid } from "uuid";
 
 export default function Home() {
   const [elements, setElements] = useState<Element[]>([]);
@@ -12,40 +14,99 @@ export default function Home() {
 
   useEffect(() => {
     const items = localStorage.getItem("elements");
-    if (items && JSON.parse(items).length > 0) {
-      setElements(JSON.parse(items));
-    } else {
+    if (!items) {
       setElements(defaultElement);
+      return;
     }
+    const parsedItems = JSON.parse(items);
+    if (parsedItems.length === 0) {
+      setElements(defaultElement);
+      return;
+    }
+    setElements(parsedItems);
   }, []);
 
   useEffect(() => {
+    if (elements.length === 0) return;
     localStorage.setItem("elements", JSON.stringify(elements));
   }, [elements]);
 
-  const onChangePosition = (index: number, x: number, y: number) => {
-    const overlappingElementIndex = placedElements.findIndex((element, i) => {
-      const width = `${element.emoji} ${element.text}`.length * 10;
+  const onChangePosition = async (
+    placedElement: PlacedElement,
+    x: number,
+    y: number
+  ) => {
+    const width = `${placedElement.emoji} ${placedElement.text}`.length * 10;
+    const rect1 = {
+      x: x,
+      y: y,
+      width: width,
+      height: 30,
+    };
+    const overlappingElement = placedElements.find((element) => {
+      const width2 = `${element.emoji} ${element.text}`.length * 10;
+      const rect2 = {
+        x: element.x,
+        y: element.y,
+        width: width2,
+        height: 30,
+      };
       return (
-        i !== index &&
-        x < element.x + width &&
-        x > element.x - width &&
-        y < element.y + 20 &&
-        y > element.y - 20
+        placedElement.id !== element.id &&
+        !(
+          rect2.x > rect1.x + rect1.width ||
+          rect2.x + rect2.width < rect1.x ||
+          rect2.y > rect1.y + rect1.height ||
+          rect2.y + rect2.height < rect1.y
+        )
       );
     });
-    if (overlappingElementIndex !== -1) {
-      console.log("overlapping element", index, overlappingElementIndex);
+    if (overlappingElement) {
+      setPlacedElements((prev) =>
+        prev
+          .filter((v) => v.id !== placedElement.id)
+          .map((v) => {
+            if (v.id === overlappingElement.id) {
+              return {
+                ...v,
+                isLoading: true,
+              };
+            }
+            return v;
+          })
+      );
+      axios
+        .get("/api/combine", {
+          params: {
+            word1: placedElement.text,
+            word2: overlappingElement.text,
+          },
+        })
+        .then(({ data }) => {
+          const newElement = {
+            ...data.element,
+            x: placedElement.x,
+            y: placedElement.y,
+          };
+          const newPlacedElements = placedElements.filter(
+            (v) => v.id !== placedElement.id && v.id !== overlappingElement.id
+          );
+          setPlacedElements([...newPlacedElements, newElement]);
+          if (elements.every((element) => element.text !== data.element.text)) {
+            setElements((prev) => [...prev, data.element]);
+          }
+        });
     } else {
-      setPlacedElements((prev) => {
-        const newPlacedElements = [...prev];
-        newPlacedElements[index] = {
-          ...newPlacedElements[index],
-          x,
-          y,
-        };
-        return newPlacedElements;
-      });
+      const index = placedElements.findIndex(
+        (element) => element.id === placedElement.id
+      );
+      if (index === -1) return;
+      const newPlacedElements = [...placedElements];
+      newPlacedElements[index] = {
+        ...placedElement,
+        x: x,
+        y: y,
+      };
     }
   };
 
@@ -55,14 +116,14 @@ export default function Home() {
       const clientOffset = monitor.getClientOffset();
       if (element && clientOffset) {
         const width = `${element.emoji} ${element.text}`.length * 10;
-        setPlacedElements((prev) => [
-          ...prev,
-          {
-            ...element,
-            x: clientOffset.x - width / 2,
-            y: clientOffset.y - 15,
-          },
-        ]);
+        const placedElement = {
+          ...element,
+          id: uuid(),
+          x: clientOffset.x - width / 2,
+          y: clientOffset.y - 15,
+        };
+        setPlacedElements((prev) => [...prev, placedElement]);
+        onChangePosition(placedElement, clientOffset.x, clientOffset.y);
       }
     },
   }));

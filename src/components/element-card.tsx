@@ -1,6 +1,7 @@
 import Draggable from "react-draggable";
 import { Element, PlacedElement } from "../interfaces/element";
 import { useDrag } from "react-dnd";
+import { Loader } from "lucide-react";
 
 export const ElementCard = ({ element }: { element: Element }) => {
   return (
@@ -38,7 +39,11 @@ export const ElementCardDraggableWrapper = ({
 }: {
   element: PlacedElement;
   index: number;
-  onChangePosition: (index: number, x: number, y: number) => void;
+  onChangePosition: (
+    placedElement: PlacedElement,
+    x: number,
+    y: number
+  ) => void;
 }) => {
   return (
     <Draggable
@@ -48,11 +53,19 @@ export const ElementCardDraggableWrapper = ({
       }}
       bounds="parent"
       onStop={(e, data) => {
-        onChangePosition(index, data.x, data.y);
+        onChangePosition(element, data.x, data.y);
       }}
     >
       <div className="absolute cursor-grabbing w-fit h-fit">
-        <ElementCard element={element} />
+        {element.isLoading && (
+          <div className="flex gap-2 px-2 border rounded-xl h-fit w-fit">
+            <div>
+              <Loader className="animate-spin inline-block" />
+            </div>
+            <div>combining</div>
+          </div>
+        )}
+        {!element.isLoading && <ElementCard element={element} />}
       </div>
     </Draggable>
   );
