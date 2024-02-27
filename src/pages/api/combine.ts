@@ -53,15 +53,8 @@ export default async function handler(
     messages: [
       {
         role: "system",
-        content: `Give me the word and emoji that represents the combination or something in between of ${word1} and ${word2}.
+        content: `Give me the word and emoji that represents the combination or something in between of "${word1}" and "${word2}".
 
-        Example: 
-        น้ำ + ไฟ = ไอน้ำ
-        ไฟ + ดิน = ลาวา
-        คน + ผู้หญิง = แม่
-        เมฆ + น้ำ = ฝน
-        น้ำ + ดิน = โคลน
-        
         ONLY answer in the following JSON format. 
         
         { "emoji": [emoji that best represent the text], "text": [text in the same language as the 2 words] }`,
