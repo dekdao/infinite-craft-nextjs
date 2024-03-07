@@ -5,7 +5,13 @@ import { Element } from "@/interfaces/element";
 import { ElementCardSideBarWrapper } from "./element-card";
 import { useDroppable } from "@dnd-kit/core";
 
-export const SideBar = ({ elements }: { elements: Element[] }) => {
+export const SideBar = ({
+  elements,
+  isLoading,
+}: {
+  elements: Element[];
+  isLoading: boolean;
+}) => {
   const [sort, setSort] = useState(Sort.Time);
   const [isDiscoveries, setIsDiscoveries] = useState(false);
   const [word, setWord] = useState("");
@@ -41,6 +47,7 @@ export const SideBar = ({ elements }: { elements: Element[] }) => {
     data: {
       type: "sidebar",
     },
+    disabled: isLoading,
   });
 
   return (
@@ -56,7 +63,11 @@ export const SideBar = ({ elements }: { elements: Element[] }) => {
               (v) => !word || v.text.includes(word) || v.emoji.includes(word)
             )
             .map((element) => (
-              <ElementCardSideBarWrapper key={element.text} element={element} />
+              <ElementCardSideBarWrapper
+                key={element.text}
+                element={element}
+                isLoading={isLoading}
+              />
             ))}
         </div>
       </div>

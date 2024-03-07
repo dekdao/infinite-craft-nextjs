@@ -9,10 +9,12 @@ export const PlaygroundArea = ({
   placedElements,
   setPlacedElements,
   setElements,
+  isLoading,
 }: {
   placedElements: PlacedElement[];
   setPlacedElements: (v: PlacedElement[]) => void;
   setElements: (v: Element[]) => void;
+  isLoading: boolean;
 }) => {
   const onClearPlacedElements = () => {
     setPlacedElements([]);
@@ -33,12 +35,13 @@ export const PlaygroundArea = ({
     data: {
       type: "playground",
     },
+    disabled: isLoading,
   });
 
   return (
     <div className="col-span-9 h-full w-full relative" ref={setNodeRef}>
       {placedElements.map((element, index) => (
-        <ElementCardDraggableWrapper key={index} element={element} />
+        <ElementCardDraggableWrapper key={index} element={element} isLoading={isLoading} />
       ))}
       <div
         className="absolute top-0 right-0 p-4 cursor-pointer hover:text-red-400"

@@ -46,17 +46,19 @@ export default async function handler(
     messages: [
       {
         role: "system",
-        content: `Give me the word and emoji that represents the combination of 2 words.
+        content: `
+        You are the best linguist in the world. 
+        You should give a word that representing or relating to the 2 given words.
 
-        Try to answer with a new words and ONLY answer in the following JSON format. 
+        Try to answer with a new word that have an actual meaning. 
+        ONLY answer in the following format. 
         
-        { "emoji": [emoji that best represent the text], "text": [text in the same language as the 2 words] }`,
+        [emoji that best represent the text],[text in the same language as the 2 words]`,
       },
-      { role: "user", content: `"${word1}" and "${word2}"` },
+      { role: "user", content: `"${word1}" and "${word2} ="` },
     ],
     model: "gpt-3.5-turbo",
-    max_tokens: 2048,
-    response_format: { type: "json_object" },
+    max_tokens: 512,
   });
 
   const output = chatCompletion["choices"][0]["message"]["content"];
@@ -65,29 +67,33 @@ export default async function handler(
     return;
   }
 
-  const jsonOutput = JSON.parse(output);
+  const splitOutput = output.split(",");
+  const result = {
+    emoji: splitOutput[0],
+    text: splitOutput[1],
+  };
 
   const existingElement2 = await ElementModel.findOne({
-    text: jsonOutput.text.toLowerCase(),
+    text: result.text.toLowerCase(),
   });
 
   if (existingElement2) {
-    jsonOutput.emoji = existingElement2.emoji;
+    result.emoji = existingElement2.emoji;
   }
 
   const newElement = new ElementModel({
     word1,
     word2,
-    emoji: jsonOutput.emoji,
-    text: jsonOutput.text.toLowerCase(),
+    emoji: result.emoji,
+    text: result.text.toLowerCase(),
   });
   await newElement.save();
 
   return res.status(200).json({
     message: "new element created",
     element: {
-      emoji: jsonOutput.emoji,
-      text: jsonOutput.text,
+      emoji: result.emoji,
+      text: result.text,
       discovered: true,
     },
   });
