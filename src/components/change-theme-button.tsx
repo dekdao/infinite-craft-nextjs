@@ -11,8 +11,8 @@ export default function ChangeThemeButton() {
         setTheme(theme === "dark" ? "light" : "dark");
       }}
     >
-      <Sun className="hidden dark:block" />
       <Moon className="block dark:hidden" />
+      <Sun className="hidden dark:block" />
     </div>
   );
 }
