@@ -11,6 +11,8 @@ Live Demo: [infinite-craft-nextjs.vercel.app](https://infinite-craft-nextjs.verc
 - **Powered by ChatGPT 3.5**: Thanks to OpenAI's tech, get ready for endless word combos that'll surprise you.
 - **Dark or Light Mode**: Switch it up to suit your vibe, whether you're a night owl or a daylight lover.
 - **Smooth Dragging**: Super easy and slick drag-and-drop action, making mixing words fun and fuss-free.
+- **Multiple Word Search Filter**: Can't find your word? No sweat. Sort, search, or filter to spotlight your discoveries or hunt for new ones.
+- **Clear and Reset Button**: Messed up or want a fresh start? Hit clear to ditch the current word or reset to wipe the slate clean and begin anew.
 
 ## Technologies
 This project is coded purely in NextJS, covering both frontend and backend functionalities. Key libraries and technologies used include:
