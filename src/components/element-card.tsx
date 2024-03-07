@@ -1,7 +1,8 @@
-import Draggable from "react-draggable";
+import { useDraggable } from "@dnd-kit/core";
 import { Element, PlacedElement } from "../interfaces/element";
-import { useDrag } from "react-dnd";
 import { Loader } from "lucide-react";
+import { CSS } from "@dnd-kit/utilities";
+import { useMemo } from "react";
 
 export const ElementCard = ({ element }: { element: Element }) => {
   return (
@@ -17,16 +18,26 @@ export const ElementCardSideBarWrapper = ({
 }: {
   element: Element;
 }) => {
-  const [, drag] = useDrag(() => ({
-    type: "sidebar-element",
-    item: element,
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  }));
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: element.text,
+    data: {
+      element,
+      type: "element",
+    },
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+  };
 
   return (
-    <div ref={drag} className="opacity-1 cursor-grab w-fit h-fit">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="w-fit h-fit"
+      {...listeners}
+      {...attributes}
+    >
       <ElementCard element={element} />
     </div>
   );
@@ -34,39 +45,43 @@ export const ElementCardSideBarWrapper = ({
 
 export const ElementCardDraggableWrapper = ({
   element,
-  index,
-  onChangePosition,
 }: {
   element: PlacedElement;
-  index: number;
-  onChangePosition: (
-    placedElement: PlacedElement,
-    x: number,
-    y: number
-  ) => void;
 }) => {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: element.id,
+    data: {
+      element,
+      type: "placed-element",
+    },
+  });
+
+  const style = useMemo(
+    () => ({
+      transform: CSS.Translate.toString(transform),
+      top: element.y,
+      left: element.x,
+    }),
+    [element.x, element.y, transform]
+  );
+
   return (
-    <Draggable
-      defaultPosition={{
-        x: element.x,
-        y: element.y,
-      }}
-      bounds="parent"
-      onStop={(e, data) => {
-        onChangePosition(element, data.x, data.y);
-      }}
+    <div
+      ref={setNodeRef}
+      className="absolute w-fit h-fit"
+      style={style}
+      {...listeners}
+      {...attributes}
     >
-      <div className="absolute cursor-grabbing w-fit h-fit">
-        {element.isLoading && (
-          <div className="flex gap-2 px-2 border rounded-xl h-fit w-fit ">
-            <div>
-              <Loader className="animate-spin inline-block" />
-            </div>
-            <div>combining</div>
+      {element.isLoading && (
+        <div className="flex gap-2 px-2 border rounded-xl h-fit w-fit ">
+          <div>
+            <Loader className="animate-spin inline-block" />
           </div>
-        )}
-        {!element.isLoading && <ElementCard element={element} />}
-      </div>
-    </Draggable>
+          <div>combining</div>
+        </div>
+      )}
+      {!element.isLoading && <ElementCard element={element} />}
+    </div>
   );
 };

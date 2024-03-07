@@ -3,16 +3,9 @@ import connectDb from "@/libs/connect-db";
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 
-// for openai
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
 });
-
-// for togetherai
-// const openai = new OpenAI({
-//   apiKey: process.env.NEXT_PUBLIC_TOGETHER_AI_API_KEY,
-//   baseURL: "https://api.together.xyz/v1",
-// });
 
 type ResponseData = {
   message: string;
@@ -53,16 +46,15 @@ export default async function handler(
     messages: [
       {
         role: "system",
-        content: `Give me the word and emoji that represents the combination or something in between of "${word1}" and "${word2}".
+        content: `Give me the word and emoji that represents the combination of 2 words.
 
-        ONLY answer in the following JSON format. 
+        Try to answer with a new words and ONLY answer in the following JSON format. 
         
         { "emoji": [emoji that best represent the text], "text": [text in the same language as the 2 words] }`,
       },
-      { role: "user", content: `${word1} + ${word2} =` },
+      { role: "user", content: `"${word1}" and "${word2}"` },
     ],
-    // model: "gpt-3.5-turbo",
-    model: "gpt-4-turbo-preview",
+    model: "gpt-3.5-turbo",
     max_tokens: 2048,
     response_format: { type: "json_object" },
   });
@@ -78,7 +70,7 @@ export default async function handler(
   const existingElement2 = await ElementModel.findOne({
     text: jsonOutput.text.toLowerCase(),
   });
-  
+
   if (existingElement2) {
     jsonOutput.emoji = existingElement2.emoji;
   }

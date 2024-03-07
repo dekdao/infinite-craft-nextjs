@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Sort, SortButton } from "./sort-button";
 import { Element } from "@/interfaces/element";
 import { ElementCardSideBarWrapper } from "./element-card";
+import { useDroppable } from "@dnd-kit/core";
 
 export const SideBar = ({ elements }: { elements: Element[] }) => {
   const [sort, setSort] = useState(Sort.Time);
@@ -35,13 +36,25 @@ export const SideBar = ({ elements }: { elements: Element[] }) => {
     }
   }, [elements, sort]);
 
+  const { setNodeRef } = useDroppable({
+    id: "sidebar-area",
+    data: {
+      type: "sidebar",
+    },
+  });
+
   return (
-    <div className="col-span-3 border-l h-screen flex flex-col">
-      <div className="flex flex-1 justify-start items-start overflow-y-scroll">
+    <div
+      className="col-span-3 border-l h-screen flex flex-col"
+      ref={setNodeRef}
+    >
+      <div className="flex flex-1 justify-start items-start overflow-y-scroll overflow-x-hidden">
         <div className="flex flex-wrap gap-2 p-2">
           {sortedElement
             .filter((v) => !isDiscoveries || (isDiscoveries && v.discovered))
-            .filter((v) => !word || v.text.includes(word) || v.emoji.includes(word))
+            .filter(
+              (v) => !word || v.text.includes(word) || v.emoji.includes(word)
+            )
             .map((element) => (
               <ElementCardSideBarWrapper key={element.text} element={element} />
             ))}

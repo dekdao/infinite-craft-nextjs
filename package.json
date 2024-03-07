@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/modifiers": "^7.0.0",
     "axios": "^1.6.7",
     "clsx": "^2.1.0",
     "lucide-react": "^0.338.0",
@@ -17,10 +18,7 @@
     "next": "14.1.0",
     "openai": "^4.28.0",
     "react": "^18",
-    "react-dnd": "^16.0.1",
-    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18",
-    "react-draggable": "^4.4.6",
     "tailwind-merge": "^2.2.1",
     "uuid": "^9.0.1"
   },
