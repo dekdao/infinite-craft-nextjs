@@ -57,7 +57,7 @@ export default async function handler(
       },
       { role: "user", content: `"${word1}" and "${word2} ="` },
     ],
-    model: "gpt-3.5-turbo",
+    model: "gpt-4o-mini",
     max_tokens: 512,
   });
 
@@ -74,7 +74,7 @@ export default async function handler(
   };
 
   const existingElement2 = await ElementModel.findOne({
-    text: result.text.toLowerCase(),
+    text: result.text.toLowerCase().trim(),
   });
 
   if (existingElement2) {
@@ -85,7 +85,7 @@ export default async function handler(
     word1,
     word2,
     emoji: result.emoji,
-    text: result.text.toLowerCase(),
+    text: result.text.toLowerCase().trim(),
   });
   await newElement.save();
 
